@@ -28,7 +28,7 @@ public class NumberSearchService {
 			);
 		}
 
-		return quickSelect(numbers, n);
+		return quickSelect(new ArrayList<>(numbers), n);
 	}
 
 	private Set<Double> readExcelFile(String filePath) throws Exception {
@@ -71,9 +71,8 @@ public class NumberSearchService {
 				return null;
 		}
 	}
-	private Double quickSelect(Set<Double> uniqueNumbers, int k) {
-		List<Double> numbersList = new ArrayList<>(uniqueNumbers);
-		return quickSelect(numbersList, 0, numbersList.size() - 1, k - 1);
+	private Double quickSelect(List<Double> uniqueNumbers, int k) {
+		return quickSelect(uniqueNumbers, 0, uniqueNumbers.size() - 1, k - 1);
 	}
 
 	private Double quickSelect(List<Double> numbers, int left, int right, int k) {
