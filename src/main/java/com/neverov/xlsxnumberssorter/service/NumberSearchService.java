@@ -1,5 +1,7 @@
 package com.neverov.xlsxnumberssorter.service;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -14,7 +16,7 @@ public class NumberSearchService {
 	public Double findNthMin(String filePath, int n) throws Exception {
 		log.info("Поиск {} минимального числа в файле: {}", n, filePath);
 
-		List<Double> numbers = readExcelFile(filePath);
+		Set<Double> numbers = readExcelFile(filePath);
 
 		if (numbers.isEmpty()) {
 			throw new IllegalArgumentException("Файл не содержит чисел");
@@ -29,9 +31,8 @@ public class NumberSearchService {
 		return quickSelect(numbers, n);
 	}
 
-	private List<Double> readExcelFile(String filePath) throws Exception {
-		List<Double> numbers = new ArrayList<>();
-
+	private Set<Double> readExcelFile(String filePath) throws Exception {
+		Set<Double> numbers = new HashSet<>();
 		if (!filePath.toLowerCase().endsWith(".xlsx")) {
 			throw new IllegalArgumentException("Поддерживаются только .xlsx файлы");
 		}
@@ -70,46 +71,46 @@ public class NumberSearchService {
 				return null;
 		}
 	}
-	private Double quickSelect(List<Double> numbers, int k) {
-		double[] arr = numbers.stream().mapToDouble(i -> i).toArray();
-		return quickSelect(arr, 0, arr.length - 1, k - 1);
+	private Double quickSelect(Set<Double> uniqueNumbers, int k) {
+		List<Double> numbersList = new ArrayList<>(uniqueNumbers);
+		return quickSelect(numbersList, 0, numbersList.size() - 1, k - 1);
 	}
 
-	private double quickSelect(double[] arr, int left, int right, int k) {
+	private Double quickSelect(List<Double> numbers, int left, int right, int k) {
 		if (left == right) {
-			return arr[left];
+			return numbers.get(left);
 		}
 
-		int pivotIndex = partition(arr, left, right);
+		int pivotIndex = partition(numbers, left, right);
 
 		if (k == pivotIndex) {
-			return arr[k];
+			return numbers.get(k);
 		} else if (k < pivotIndex) {
-			return quickSelect(arr, left, pivotIndex - 1, k);
+			return quickSelect(numbers, left, pivotIndex - 1, k);
 		} else {
-			return quickSelect(arr, pivotIndex + 1, right, k);
+			return quickSelect(numbers, pivotIndex + 1, right, k);
 		}
 	}
 
-	private int partition(double[] arr, int left, int right) {
-		double pivot = arr[right];
+	private int partition(List<Double> numbers, int left, int right) {
+		double pivot = numbers.get(right);
 		int i = left;
 
 		for (int j = left; j < right; j++) {
-			if (arr[j] <= pivot) {
-				swap(arr, i, j);
+			if (numbers.get(j) <= pivot) {
+				swap(numbers, i, j);
 				i++;
 			}
 		}
 
-		swap(arr, i, right);
+		swap(numbers, i, right);
 		return i;
 	}
 
-	private void swap(double[] arr, int i, int j) {
-		double temp = arr[i];
-		arr[i] = arr[j];
-		arr[j] = temp;
+	private void swap(List<Double> numbers, int i, int j) {
+		double temp = numbers.get(i);
+		numbers.set(i, numbers.get(j));
+		numbers.set(j, temp);
 	}
 
 }
